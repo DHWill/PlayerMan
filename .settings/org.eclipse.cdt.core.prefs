@@ -1,0 +1,11 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1584882010/PKG_CONFIG_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1584882010/PKG_CONFIG_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1584882010/PKG_CONFIG_PATH/value=/opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/lib/pkgconfig
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1584882010/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.1584882010/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.1063968472/PKG_CONFIG_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.1063968472/PKG_CONFIG_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.1063968472/PKG_CONFIG_PATH/value=/opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/lib/pkgconfig
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.1063968472/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.1063968472/appendContributed=true
