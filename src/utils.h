@@ -18,7 +18,7 @@ public:
     Utils();
     void pollGPIO();
     void readFile(std::string file);
-    std::vector<std::string> getDirsInPath(gchar* path);
+    std::vector<std::string> getDirsInPath(const char* path);
     std::string runCmd(const std::string& command);
     bool doesFileExist(const std::string& name);
 

@@ -10,9 +10,7 @@
 
 
 Manager::Manager() {
-//	findAWPaths();
-	// TODO Auto-generated constructor stub
-
+	findAWPaths();
 }
 
 Manager::~Manager() {
@@ -22,16 +20,42 @@ Manager::~Manager() {
 
 //check in here for legal files
 void Manager::findAWPaths(){
-    gchar* awPath = "/home/root/player/AW/";
-    std::vector<std::string> awDirs = tools.getDirsInPath(awPath);
+    std::vector<std::string> awDirs = tools.getDirsInPath(dirAw.c_str());
 
-    for(auto n : awDirs){
-        std::string absFileLoc = std::string(awPath) + n + "/";
+    for(auto subDir : awDirs){
+        std::string absFileLoc = dirAw + subDir + "/";
         std::cout << "Found: " << absFileLoc << std::endl;
-        Artwork aw;
-        aw.awName = n;
-        aw.awPath = absFileLoc;
+        ArtworkInfo aw;
+        aw.awName = subDir;
+        aw.awVideo = absFileLoc + fileVideo;
+        aw.awJson = absFileLoc + fileJson;
         aw.awSplash = absFileLoc + "sig.png";
         artworks.push_back(aw);
     }
+}
+
+void Manager::killApplication(){
+
+	system("kill");
+
+}
+
+
+Manager::ArtworkInfo Manager::getNextAW(){
+	if(artworks.size() > awIndex){
+		ArtworkInfo awInfo = artworks[awIndex];
+		awIndex ++;
+		awIndex %= artworks.size();
+		return awInfo;
+	}
+}
+
+Manager::ArtworkInfo Manager::getAW(std::string name){
+	ArtworkInfo awInfo = artworks[awIndex];
+	for(auto artwork : artworks){
+		if(artwork.awName == name){
+			awInfo = artwork;
+		}
+	}
+	return awInfo;
 }

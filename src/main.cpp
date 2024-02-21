@@ -4,6 +4,7 @@
 #include <string.h>
 #include <fstream>
 #include "Manager.h"
+//#include <ostream>
 
 #include <ncurses.h>
 #include <iostream>
@@ -54,8 +55,7 @@ static gboolean pollForUpdate(gpointer user_data){
 		gPointerData* data = (gPointerData*)user_data;
 
 		GtkWidget *image;
-		image = gtk_image_new_from_file(data->awManager->artworks[0].awSplash.c_str());
-		image = gtk_image_new_from_file("/home/root/player/sig.png");
+		image = gtk_image_new_from_file(data->awManager->getNextAW().awSplash.c_str());
 
 		GdkRGBA color;
 		gdk_rgba_parse(&color, "black"); // Change "red" to any color you want
@@ -63,6 +63,8 @@ static gboolean pollForUpdate(gpointer user_data){
 
 		gtk_container_add(GTK_CONTAINER(data->window), image);
 		gtk_widget_show_all(data->window);
+
+//		usleep(GTime)
 
 	}
     //os.launch the video player
@@ -91,7 +93,7 @@ int main (int argc,char **argv){
 
     GtkWidget *window = nullptr;
     Manager man;
-    man.findAWPaths();
+
     Manager *manager = &man;
 
     gPointerData *data = g_new(gPointerData, 1);

@@ -111,7 +111,7 @@ std::string Utils::runCmd(const std::string& command)
     return result;
 }
 
-std::vector<std::string> Utils::getDirsInPath(gchar* path){
+std::vector<std::string> Utils::getDirsInPath(const char* path){
     // const char* PATH = "/home/william/";
     std::vector<std::string> paths;
     GDir *dir;
