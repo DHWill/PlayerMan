@@ -5,7 +5,20 @@ Utils::Utils() {
 }
 
 ///home/william/Source/Manager/manqmake/untitled/fish.png
+/*
+ * 	   killall helloworld-debug &
+	   killall helloworld &
+ *
+ * 	   $SPLASH_APP $folder"/"${directories[INDEX]}"/splash.jpg" 1 &
+	   $PLAYER_APP $folder"/"${directories[INDEX]}"/Video.mp4" $folder"/"${directories[INDEX]}"/video_states.json" & >/dev/null
+	   PLAYER_APP="/home/root/player/launcher.sh"
 
+	    //Kill cursor (Just unplug mouse)
+//    GdkCursor* Cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
+//	GdkWindow* win = gtk_widget_get_window((data->window));
+//	gdk_window_set_cursor((win),Cursor);
+ *
+ */
 
 void Utils::pollGPIO(){
     const std::string GPIO_PATH = "/sys/class/gpio/gpioXX";  // Replace XX with the GPIO

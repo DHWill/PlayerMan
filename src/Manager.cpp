@@ -19,7 +19,8 @@ Manager::~Manager() {
 
 
 //check in here for legal files
-void Manager::findAWPaths(){
+void Manager::findAWPaths()
+{
     std::vector<std::string> awDirs = tools.getDirsInPath(dirAw.c_str());
 
     for(auto subDir : awDirs){
@@ -34,9 +35,17 @@ void Manager::findAWPaths(){
     }
 }
 
-void Manager::killApplication(){
+void Manager::killPlayer(){
+	std::string command;
+	command = "killall " + filePlayer + " &";
+	system(command.c_str());
 
-	system("kill");
+}
+
+void Manager::launchPlayer(ArtworkInfo awInfo){
+	std::string command;
+	command = dirApp + fileLauncher + " " + awInfo.awVideo + " " + awInfo.awJson + " &";
+	system(command.c_str());
 
 }
 
