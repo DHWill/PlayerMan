@@ -8,6 +8,8 @@
 #ifndef MANAGER_H_
 #define MANAGER_H_
 #include <vector>
+#include <gtk/gtk.h>
+#include <gdk.h>
 
 #include "utils.h"
 
@@ -27,8 +29,13 @@ public:
 	void findAWPaths();
 	void killPlayer();
 	void launchPlayer(ArtworkInfo awInfo);
+	void setAW(ArtworkInfo _artwork);
+
 	ArtworkInfo getNextAW();
 	ArtworkInfo getAW(std::string name);
+	ArtworkInfo currentArtwork;
+
+	bool is_changing = false;
 
 
 	int awIndex = 0;
@@ -40,6 +47,8 @@ public:
 	std::string fileVideo = "Video.mp4";
 	std::string fileJson = "video_states.json";
 	std::string dirAw = dirApp + "AW/";
+
+	std::vector<GtkImage> splashImages;
 };
 
 #endif /* MANAGER_H_ */

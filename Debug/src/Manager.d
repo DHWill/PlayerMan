@@ -1,4 +1,4 @@
-src/Manager.o: ../src/Manager.cpp ../src/Manager.h ../src/utils.h \
+src/Manager.o: ../src/Manager.cpp ../src/Manager.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkconfig.h \
@@ -656,9 +656,10 @@ src/Manager.o: ../src/Manager.cpp ../src/Manager.h ../src/utils.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvscale.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvscrollbar.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvseparator.h \
- /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk-autocleanups.h
+ /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk-autocleanups.h \
+ /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h \
+ ../src/utils.h
 ../src/Manager.h:
-../src/utils.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkconfig.h:
@@ -1317,3 +1318,5 @@ src/Manager.o: ../src/Manager.cpp ../src/Manager.h ../src/utils.h \
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvscrollbar.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvseparator.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk-autocleanups.h:
+/opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h:
+../src/utils.h:

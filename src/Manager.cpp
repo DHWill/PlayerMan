@@ -19,18 +19,18 @@ Manager::~Manager() {
 
 
 //check in here for legal files
-void Manager::findAWPaths()
-{
+void Manager::findAWPaths(){
     std::vector<std::string> awDirs = tools.getDirsInPath(dirAw.c_str());
 
     for(auto subDir : awDirs){
         std::string absFileLoc = dirAw + subDir + "/";
         std::cout << "Found: " << absFileLoc << std::endl;
         ArtworkInfo aw;
+
         aw.awName = subDir;
         aw.awVideo = absFileLoc + fileVideo;
         aw.awJson = absFileLoc + fileJson;
-        aw.awSplash = absFileLoc + "sig.png";
+        aw.awSplash = absFileLoc + "sig.png";;
         artworks.push_back(aw);
     }
 }
@@ -48,7 +48,10 @@ void Manager::launchPlayer(ArtworkInfo awInfo){
 	system(command.c_str());
 
 }
+void Manager::setAW(ArtworkInfo _artwork){
+	currentArtwork = _artwork;
 
+}
 
 Manager::ArtworkInfo Manager::getNextAW(){
 	if(artworks.size() > awIndex){

@@ -43,6 +43,7 @@ typedef struct {
     Manager *awManager;
     GtkWidget *window;
 } gPointerData;
+
 Utils manUtils;
 
 static void on_file_selected(GtkFileChooser *chooser, gpointer data) {
@@ -66,38 +67,72 @@ static void open_file_dialog(gpointer user_data) {
 	gtk_widget_show_all(dialog);
 }
 
-static gboolean launchAW(gpointer user_data){
+static gboolean showSplashScreen(gpointer user_data){
+	gPointerData* data = (gPointerData*)user_data;
+	GtkWidget *image;
+	image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
+	gtk_container_add(GTK_CONTAINER(data->window), image);
+	gtk_widget_show_all(data->window);
+	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
 
+	return FALSE;
+}
+
+static gboolean killAW(gpointer user_data){
+	gPointerData* data = (gPointerData*)user_data;
+	data->awManager->killPlayer();
+}
+
+static gboolean launchArtwork(gpointer user_data){
+	gPointerData* data = (gPointerData*)user_data;
+
+	std::cout << "launching: " << data->awManager->currentArtwork.awName << std::endl;
+	data->awManager->launchPlayer(data->awManager->currentArtwork);
+	data->awManager->is_changing = false;
+//	g_timeout_add(guint(200), pollForUpdate, user_data);
+	return FALSE;
+}
+
+static gboolean showArtworkInfo(gpointer user_data){
+	gPointerData* data = (gPointerData*)user_data;
+
+	GtkWidget *image;
+	std::cout << "showing splash: " << data->awManager->currentArtwork.awSplash << std::endl;
+	image = gtk_image_new_from_file(data->awManager->currentArtwork.awSplash.c_str());
+//	GtkWidget * remove = GTK_CONTAINER(data->window)->widget
+//	gtk_container_remove(GTK_CONTAINER(data->window), remove);
+	gtk_container_add(GTK_CONTAINER(data->window), image);
+	gtk_widget_show_all(data->window);
+	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
+	killAW(user_data);
+
+	//launch AW
+	g_timeout_add(guint(2000), launchArtwork, user_data);
+
+	return FALSE;
 }
 
 
 static gboolean pollForUpdate(gpointer user_data){
+	gPointerData *data = (gPointerData*) user_data;
 
-	int buttonStat = manUtils.readGPIOfs();
-
-	if(buttonStat == 0){
-		//The button has been Pressed
-
-		gPointerData* data = (gPointerData*)user_data;
-
-		Manager::ArtworkInfo artwork = data->awManager->getNextAW();
-		GtkWidget *image;
-		image = gtk_image_new_from_file(artwork.awSplash.c_str());
-
-		data->awManager->killPlayer();
-		data->awManager->launchPlayer(artwork);
-		std::cout << artwork.awName << std::endl;
-//		usleep(2000);
-
-//		open_file_dialog(user_data);		//Open Copy Files
-//		usleep(GTime)
-
+	if (!data->awManager->is_changing) {
+		int buttonStat = manUtils.readGPIOfs();
+		if (buttonStat == 0) {		//The button has been Pressed
+			Manager::ArtworkInfo artwork = data->awManager->getNextAW();
+			data->awManager->setAW(artwork);
+			showArtworkInfo(user_data);
+			data->awManager->is_changing = true;
+//			return FALSE;
+		}
 	}
 
     return TRUE;
 }
 
 static void activate(GtkApplication* app, gpointer user_data){
+
+	pollForUpdate(user_data);
 
 
     gPointerData* data =  (gPointerData*)user_data;
@@ -119,16 +154,15 @@ static void activate(GtkApplication* app, gpointer user_data){
 	image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
 	gtk_container_add(GTK_CONTAINER(data->window), image);
 	gtk_widget_show_all(data->window);
-	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
+//	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
 
 	//launchAW
-	Manager::ArtworkInfo artwork = data->awManager->getNextAW();
-	data->awManager->killPlayer();
-	data->awManager->launchPlayer(artwork);
-	std::cout << artwork.awName << std::endl;
+	data->awManager->setAW(data->awManager->getNextAW());
+	data->awManager->is_changing = true;
 
 
-    g_timeout_add(guint(200), pollForUpdate, user_data);
+	g_timeout_add(guint(1000), showArtworkInfo, user_data);
+	g_timeout_add(guint(500), pollForUpdate, user_data);
 }
 
 
