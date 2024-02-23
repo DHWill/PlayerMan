@@ -42,6 +42,7 @@
 typedef struct {
     Manager *awManager;
     GtkWidget *window;
+    GtkWidget *image;
 } gPointerData;
 
 Utils manUtils;
@@ -96,12 +97,12 @@ static gboolean launchArtwork(gpointer user_data){
 static gboolean showArtworkInfo(gpointer user_data){
 	gPointerData* data = (gPointerData*)user_data;
 
-	GtkWidget *image;
 	std::cout << "showing splash: " << data->awManager->currentArtwork.awSplash << std::endl;
-	image = gtk_image_new_from_file(data->awManager->currentArtwork.awSplash.c_str());
-//	GtkWidget * remove = GTK_CONTAINER(data->window)->widget
-//	gtk_container_remove(GTK_CONTAINER(data->window), remove);
-	gtk_container_add(GTK_CONTAINER(data->window), image);
+//	GdkPixbuf *pixBuf = gdk_pixbuf_new_from_file(data->awManager->currentArtwork.awSplash.c_str(), NULL);
+	gtk_image_set_from_pixbuf(GTK_IMAGE(data->image), data->awManager->currentArtwork.splashPixBuf);
+//	gtk_container_remove(GTK_CONTAINER(data->window), data->image);
+//	gtk_container_add(GTK_CONTAINER(data->window), image);
+
 	gtk_widget_show_all(data->window);
 	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
 	killAW(user_data);
@@ -130,6 +131,7 @@ static gboolean pollForUpdate(gpointer user_data){
     return TRUE;
 }
 
+std::vector<GdkPixbuf*> buffs;
 static void activate(GtkApplication* app, gpointer user_data){
 
 	pollForUpdate(user_data);
@@ -159,6 +161,7 @@ static void activate(GtkApplication* app, gpointer user_data){
 	//launchAW
 	data->awManager->setAW(data->awManager->getNextAW());
 	data->awManager->is_changing = true;
+	data->image = image;
 
 
 	g_timeout_add(guint(1000), showArtworkInfo, user_data);
@@ -169,19 +172,16 @@ static void activate(GtkApplication* app, gpointer user_data){
 
 int main (int argc,char **argv){
     GtkApplication *app;
-
     app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
 
-
     GtkWidget *window = nullptr;
-    Manager man;
 
+    Manager man;
     Manager *manager = &man;
 
     gPointerData *data = g_new(gPointerData, 1);
     data->window = window;
     data->awManager = manager;
-
 
     g_signal_connect(app, "activate", G_CALLBACK (activate), data);
 

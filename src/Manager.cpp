@@ -30,7 +30,8 @@ void Manager::findAWPaths(){
         aw.awName = subDir;
         aw.awVideo = absFileLoc + fileVideo;
         aw.awJson = absFileLoc + fileJson;
-        aw.awSplash = absFileLoc + "sig.png";;
+        aw.awSplash = absFileLoc + "sig.png";
+        aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
         artworks.push_back(aw);
     }
 }

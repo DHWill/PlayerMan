@@ -1,5 +1,4 @@
 src/Manager.o: ../src/Manager.cpp ../src/Manager.h \
- /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkconfig.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/glib-2.0/glib.h \
@@ -361,6 +360,9 @@ src/Manager.o: ../src/Manager.cpp ../src/Manager.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkthreads.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkvisual.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk-autocleanup.h \
+ ../src/utils.h \
+ /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk.h \
+ /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtkaboutdialog.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtkdialog.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtkwindow.h \
@@ -656,11 +658,8 @@ src/Manager.o: ../src/Manager.cpp ../src/Manager.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvscale.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvscrollbar.h \
  /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvseparator.h \
- /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk-autocleanups.h \
- /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h \
- ../src/utils.h
+ /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk-autocleanups.h
 ../src/Manager.h:
-/opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkconfig.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/glib-2.0/glib.h:
@@ -1022,6 +1021,9 @@ src/Manager.o: ../src/Manager.cpp ../src/Manager.h \
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkthreads.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdkvisual.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk-autocleanup.h:
+../src/utils.h:
+/opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk.h:
+/opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtkaboutdialog.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtkdialog.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtkwindow.h:
@@ -1318,5 +1320,3 @@ src/Manager.o: ../src/Manager.cpp ../src/Manager.h \
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvscrollbar.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/deprecated/gtkvseparator.h:
 /opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gtk/gtk-autocleanups.h:
-/opt/tdx-xwayland/6.6.0/sysroots/cortexa72-cortexa53-tdx-linux/usr/include/gtk-3.0/gdk/gdk.h:
-../src/utils.h:

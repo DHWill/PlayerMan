@@ -8,7 +8,6 @@
 #ifndef MANAGER_H_
 #define MANAGER_H_
 #include <vector>
-#include <gtk/gtk.h>
 #include <gdk.h>
 
 #include "utils.h"
@@ -23,6 +22,7 @@ public:
 		std::string awJson;
 		std::string awSplash;
 		std::string awName;
+		GdkPixbuf *splashPixBuf;
 	} ArtworkInfo;
 
 	Utils tools;
@@ -48,7 +48,7 @@ public:
 	std::string fileJson = "video_states.json";
 	std::string dirAw = dirApp + "AW/";
 
-	std::vector<GtkImage> splashImages;
+
 };
 
 #endif /* MANAGER_H_ */
