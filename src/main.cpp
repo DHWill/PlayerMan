@@ -30,28 +30,39 @@ static void open_message_dialog(gpointer user_data) {
 }
 
 static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer user_data) {
-	gPointerData* data = (gPointerData*)user_data;
+	gPointerData *data = (gPointerData*) user_data;
 	gchar *filename = gtk_file_chooser_get_filename(chooser);
 
 	gMessageDialogue *messageDialogue = g_new(gMessageDialogue, 1);
 	messageDialogue->dialog = GTK_DIALOG(chooser);
+	std::string _message = "";
+	if (response_id == GTK_RESPONSE_ACCEPT) {
+		if (data->awManager->copyFiles(filename, data->awManager->dirAw)) {
+			_message = "Copied " + std::string(filename) + " to: " + data->awManager->dirAw;
+		} else {
+			_message = "Error in Copying " + std::string(filename) + " to: " + data->awManager->dirAw + "cleaning up.. ";
+			std::string awCopyPath = std::string(filename);
+			size_t found = awCopyPath .find_last_of("/");
+		    std::string awSubFolder = awCopyPath.substr(found + 1);
 
-    	if(response_id == GTK_RESPONSE_ACCEPT){
-    		std::cout << "File selection copy directory." << std::endl;
-    		data->awManager->copyFiles(filename, data->awManager->dirAw);
-    		std::string _message = "Copied " + std::string(filename) + "to: " + data->awManager->dirAw;
-    		messageDialogue->message = (gchar*)_message.c_str();
-    		open_message_dialog(messageDialogue);
-    		// do copy in here
-    	}
-    	else if(response_id == GTK_RESPONSE_CANCEL){
-            std::cout << "File selection remove." << std::endl;
-            data->awManager->removeFiles(filename);
-            // do delete here
-    	}
-    	else if(response_id == GTK_RESPONSE_DELETE_EVENT){
-            std::cout << "File selection Exit." << std::endl;
-    	}
+			data->awManager->removeFiles(data->awManager->dirAw + awSubFolder);
+		}
+	}
+
+	else if (response_id == GTK_RESPONSE_CANCEL) {
+		std::cout << "File selection remove." << std::endl;
+		if (data->awManager->removeFiles(filename)) {
+			_message = "Removed " + std::string(filename);
+		} else {
+			_message = "Could NOT Remove " + std::string(filename);
+		}
+	}
+
+	else if (response_id == GTK_RESPONSE_DELETE_EVENT) {
+		std::cout << "File selection Exit." << std::endl;
+	}
+	messageDialogue->message = (gchar*) _message.c_str();
+	open_message_dialog(messageDialogue);
 	g_free(filename);
 //	g_free(data);
 //	g_free(messageDialogue);

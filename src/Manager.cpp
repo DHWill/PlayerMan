@@ -72,7 +72,7 @@ bool Manager::copyFiles(std::string source, std::string destination){
 	command = "cp -r " + source + " " + destination;
 	int _ret = tools.runSystem(command);
 	std::cout << "system return" << _ret << std::endl;
-	return true;
+	return (_ret == 0);
 }
 
 bool Manager::removeFiles(std::string source){
@@ -80,7 +80,7 @@ bool Manager::removeFiles(std::string source){
 	command = "rm -r " + source;
 	int _ret = tools.runSystem(command);
 	std::cout << "system return" << _ret << std::endl;
-	return _ret;
+	return (_ret == 0);
 }
 
 Manager::ArtworkInfo Manager::getNextAW(){
