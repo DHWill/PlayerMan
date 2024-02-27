@@ -22,78 +22,6 @@ typedef struct {
 
 Utils manUtils;
 
-static void open_message_dialog(gpointer user_data) {
-	gMessageDialogue* data = (gMessageDialogue*)user_data;
-	GtkWidget *message_dialog = gtk_message_dialog_new(GTK_WINDOW(data->dialog),GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_OK,data->message);
-	gtk_dialog_run(GTK_DIALOG(message_dialog));
-	gtk_widget_destroy (GTK_WIDGET(message_dialog));
-}
-
-static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer user_data) {
-	gPointerData *data = (gPointerData*) user_data;
-	gchar *filename = gtk_file_chooser_get_filename(chooser);
-
-	gMessageDialogue *messageDialogue = g_new(gMessageDialogue, 1);
-	messageDialogue->dialog = GTK_DIALOG(chooser);
-	std::string _message = "";
-	if (response_id == GTK_RESPONSE_ACCEPT) {
-		if (data->awManager->copyFiles(filename, data->awManager->dirAw)) {
-			_message = "Copied " + std::string(filename) + " to: " + data->awManager->dirAw;
-		} else {
-			_message = "Error in Copying " + std::string(filename) + " to: " + data->awManager->dirAw + "cleaning up.. ";
-			std::string awCopyPath = std::string(filename);
-			size_t found = awCopyPath .find_last_of("/");
-		    std::string awSubFolder = awCopyPath.substr(found + 1);
-
-			data->awManager->removeFiles(data->awManager->dirAw + awSubFolder);
-		}
-	}
-
-	else if (response_id == GTK_RESPONSE_CANCEL) {
-		std::cout << "File selection remove." << std::endl;
-		if (data->awManager->removeFiles(filename)) {
-			_message = "Removed " + std::string(filename);
-		} else {
-			_message = "Could NOT Remove " + std::string(filename);
-		}
-	}
-
-	else if (response_id == GTK_RESPONSE_DELETE_EVENT) {
-		std::cout << "File selection Exit." << std::endl;
-	}
-	messageDialogue->message = (gchar*) _message.c_str();
-	open_message_dialog(messageDialogue);
-	g_free(filename);
-//	g_free(data);
-//	g_free(messageDialogue);
-}
-
-static void open_file_dialog(gpointer user_data) {
-	gPointerData* data = (gPointerData*)user_data;
-
-	GtkWidget *dialog = gtk_file_chooser_dialog_new("Copy or Remove Artwork Folders",
-			GTK_WINDOW(data->window), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, "Delete",
-			GTK_RESPONSE_CANCEL, "Copy", GTK_RESPONSE_ACCEPT,
-			NULL);
-	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "/home/root/", NULL);
-	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "recent", NULL);
-	gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(dialog), data->awManager->dirAw.c_str(), NULL);
-	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),data->awManager->dirAw.c_str());
-
-	g_signal_connect(dialog, "response", G_CALLBACK(on_file_selected), user_data);
-	gtk_widget_show_all(dialog);
-}
-
-static gboolean showSplashScreen(gpointer user_data){
-	gPointerData* data = (gPointerData*)user_data;
-	GtkWidget *image;
-	image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
-	gtk_container_add(GTK_CONTAINER(data->window), image);
-	gtk_widget_show_all(data->window);
-	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
-	return FALSE;
-}
-
 static gboolean killAW(gpointer user_data){
 	gPointerData* data = (gPointerData*)user_data;
 	data->awManager->killPlayer();
@@ -127,6 +55,12 @@ static gboolean showArtworkInfo(gpointer user_data){
 	return FALSE;
 }
 
+static void open_message_dialog(gpointer user_data) {
+	gMessageDialogue* data = (gMessageDialogue*)user_data;
+	GtkWidget *message_dialog = gtk_message_dialog_new(GTK_WINDOW(data->dialog),GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_OK,data->message);
+	gtk_dialog_run(GTK_DIALOG(message_dialog));
+	gtk_widget_destroy (GTK_WIDGET(message_dialog));
+}
 
 static gboolean pollForUpdate(gpointer user_data){
 	gPointerData *data = (gPointerData*) user_data;
@@ -141,9 +75,72 @@ static gboolean pollForUpdate(gpointer user_data){
 //			return FALSE;
 		}
 	}
-
     return TRUE;
 }
+
+static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer user_data) {
+	gPointerData *data = (gPointerData*) user_data;
+	gchar *filename = gtk_file_chooser_get_filename(chooser);
+
+	gMessageDialogue *messageDialogue = g_new(gMessageDialogue, 1);
+	messageDialogue->dialog = GTK_DIALOG(chooser);
+	std::string _message = "";
+	if (response_id == GTK_RESPONSE_ACCEPT) {
+		if (data->awManager->copyFiles(filename, data->awManager->dirAw)) {
+			_message = "Copied " + std::string(filename) + " to: " + data->awManager->dirAw;
+		} else {
+			_message = "Error in Copying " + std::string(filename) + " to: " + data->awManager->dirAw + "cleaning up.. ";
+			std::string awCopyPath = std::string(filename);
+			data->awManager->cleanUpFalseCopy(awCopyPath);
+		}
+	}
+
+	else if (response_id == GTK_RESPONSE_CANCEL) {
+		if (data->awManager->removeFiles(filename)) {
+			_message = "Removed " + std::string(filename);
+		} else {
+			_message = "Could NOT Remove " + std::string(filename);
+		}
+	}
+
+	else if (response_id == GTK_RESPONSE_DELETE_EVENT) {
+		_message = "Closing Artwork Copier, Launching Player.. ";
+		GtkWidget *image;
+		image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
+		gtk_container_add(GTK_CONTAINER(data->window), image);
+		gtk_widget_show_all(data->window);
+		gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
+		data->awManager->findAWPaths();
+		data->awManager->setAW(data->awManager->getNextAW());
+		data->awManager->is_changing = true;
+		data->image = image;
+
+		g_timeout_add(guint(1000), showArtworkInfo, user_data);
+		g_timeout_add(guint(500), pollForUpdate, user_data);
+	}
+	messageDialogue->message = (gchar*) _message.c_str();
+	open_message_dialog(messageDialogue);
+	g_free(filename);
+//	g_free(data);
+//	g_free(messageDialogue);
+}
+
+static void open_file_dialog(gpointer user_data) {
+	gPointerData* data = (gPointerData*)user_data;
+
+	GtkWidget *dialog = gtk_file_chooser_dialog_new("Copy or Remove Artwork Folders",
+			GTK_WINDOW(data->window), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, "Delete",
+			GTK_RESPONSE_CANCEL, "Copy", GTK_RESPONSE_ACCEPT,
+			NULL);
+	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "/home/root/", NULL);
+	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "recent", NULL);
+	gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(dialog), data->awManager->dirAw.c_str(), NULL);
+	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),data->awManager->dirAw.c_str());
+
+	g_signal_connect(dialog, "response", G_CALLBACK(on_file_selected), user_data);
+	gtk_widget_show_all(dialog);
+}
+
 
 
 static void activate(GtkApplication* app, gpointer user_data){
@@ -163,13 +160,13 @@ static void activate(GtkApplication* app, gpointer user_data){
 	gtk_widget_override_background_color(data->window, GTK_STATE_FLAG_NORMAL, &color);
 
 	//image
+
 	if(data->awManager->hasPaths){
 		GtkWidget *image;
 		image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
 		gtk_container_add(GTK_CONTAINER(data->window), image);
 		gtk_widget_show_all(data->window);
 		gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
-
 		//launchAW
 		data->awManager->setAW(data->awManager->getNextAW());
 		data->awManager->is_changing = true;

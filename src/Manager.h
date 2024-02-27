@@ -32,6 +32,7 @@ public:
 	void setAW(ArtworkInfo _artwork);
 	bool copyFiles(std::string source, std::string destination);
 	bool removeFiles(std::string source);
+	bool cleanUpFalseCopy(std::string source);
 
 	bool hasPaths = false;
 
