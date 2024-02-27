@@ -16,7 +16,7 @@ typedef struct {
 } gPointerData;
 
 typedef struct {
-	std::string message;
+	gchar *message;
 	GtkDialog *dialog;
 } gMessageDialogue;
 
@@ -24,7 +24,7 @@ Utils manUtils;
 
 static void open_message_dialog(gpointer user_data) {
 	gMessageDialogue* data = (gMessageDialogue*)user_data;
-	GtkWidget *message_dialog = gtk_message_dialog_new(GTK_WINDOW(data->dialog),GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_OK,data->message.c_str());
+	GtkWidget *message_dialog = gtk_message_dialog_new(GTK_WINDOW(data->dialog),GTK_DIALOG_MODAL,GTK_MESSAGE_INFO,GTK_BUTTONS_OK,data->message);
 	gtk_dialog_run(GTK_DIALOG(message_dialog));
 	gtk_widget_destroy (GTK_WIDGET(message_dialog));
 }
@@ -35,30 +35,26 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 
 	gMessageDialogue *messageDialogue = g_new(gMessageDialogue, 1);
 	messageDialogue->dialog = GTK_DIALOG(chooser);
-	messageDialogue->message = "";
 
-    switch (response_id) {
-    	case GTK_RESPONSE_ACCEPT:
+    	if(response_id == GTK_RESPONSE_ACCEPT){
     		std::cout << "File selection copy directory." << std::endl;
     		data->awManager->copyFiles(filename, data->awManager->dirAw);
-    		messageDialogue->message = "Copied Artwork to ";
+    		std::string _message = "Copied " + std::string(filename) + "to: " + data->awManager->dirAw;
+    		messageDialogue->message = (gchar*)_message.c_str();
     		open_message_dialog(messageDialogue);
     		// do copy in here
-            break;
-        case GTK_RESPONSE_CANCEL:
+    	}
+    	else if(response_id == GTK_RESPONSE_CANCEL){
             std::cout << "File selection remove." << std::endl;
             data->awManager->removeFiles(filename);
             // do delete here
-            break;
-        case GTK_RESPONSE_DELETE_EVENT:
+    	}
+    	else if(response_id == GTK_RESPONSE_DELETE_EVENT){
             std::cout << "File selection Exit." << std::endl;
-            //check files and launch
-            break;
-        default:
-            std::cout << "Unexpected response." << std::endl;
-//            break;
+    	}
 	g_free(filename);
-    }
+//	g_free(data);
+//	g_free(messageDialogue);
 }
 
 static void open_file_dialog(gpointer user_data) {
@@ -68,9 +64,6 @@ static void open_file_dialog(gpointer user_data) {
 			GTK_WINDOW(data->window), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, "Delete",
 			GTK_RESPONSE_CANCEL, "Copy", GTK_RESPONSE_ACCEPT,
 			NULL);
-
-//	gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dialog), TRUE);
-//	gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(dialog), TRUE);
 	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "/home/root/", NULL);
 	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "recent", NULL);
 	gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(dialog), data->awManager->dirAw.c_str(), NULL);
