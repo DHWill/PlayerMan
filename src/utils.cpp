@@ -20,6 +20,89 @@ Utils::Utils() {
  *
  */
 
+
+#include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+//int Utils::dirStatus() {
+//    std::string path = "path_to_your_file_or_directory";
+//
+//    // Check if the path exists
+//    if (fs::exists(path)) {
+//        // Check if it's a regular file
+//        if (fs::is_regular_file(path)) {
+//            std::cout << "The path refers to a regular file." << std::endl;
+//        }
+//        // Check if it's a directory
+//        else if (fs::is_directory(path)) {
+//            std::cout << "The path refers to a directory." << std::endl;
+//        }
+//        // If it's neither a regular file nor a directory
+//        else {
+//            std::cout << "The path exists but is neither a regular file nor a directory." << std::endl;
+//        }
+//    } else {
+//        std::cout << "The path does not exist." << std::endl;
+//    }
+//
+//    return 0;
+//}
+
+//void Utils::chechDirStatus(const std::filesystem::path& p, std::filesystem::file_status s){
+//    std::cout << p;
+//    // alternative: switch(s.type()) { case fs::file_type::regular: ...}
+//    if (std::filesystem::is_regular_file(s)){
+//        std::cout << " is a regular file\n";
+//    }
+//    if (std::filesystem::is_directory(s)){
+//        std::cout << " is a directory\n";
+//    }
+//    if (std::filesystem::is_block_file(s)){
+//        std::cout << " is a block device\n";
+//    }
+//    if (std::filesystem::is_character_file(s))
+//    {
+//        std::cout << " is a character device\n";
+//    }
+//    if (std::filesystem::is_fifo(s)){
+//        std::cout << " is a named IPC pipe\n";
+//    }
+//    if (std::filesystem::is_socket(s)){
+//        std::cout << " is a named IPC socket\n";
+//    }
+//    if (std::filesystem::is_symlink(s)){
+//        std::cout << " is a symlink\n";
+//    }
+//    if (!std::filesystem::exists(s)){
+//        std::cout << " does not exist\n";
+//    }
+//}
+
+
+bool Utils::dirStatus(const char* _pathname) {
+	bool status;
+//	const char* pathname = _pathname.c_str();
+	struct stat info;
+
+	if (stat(_pathname, &info) != 0) {
+		printf("cannot access %s\n", _pathname);
+		status = false;
+
+	} else if (info.st_mode & S_IFDIR) {
+		printf("%s is a directory\n", _pathname);
+		status = true;
+	} else {
+		printf("%s is no directory\n", _pathname);
+		status = false;
+	}
+	return status;
+}
+
+
+
+
 void Utils::pollGPIO(){
     const std::string GPIO_PATH = "/sys/class/gpio/gpioXX";  // Replace XX with the GPIO
     // Export the GPIO pin (if not already exported)
@@ -78,9 +161,10 @@ int Utils::readGPIOfs(){
 	fp = popen("gpioget 2 8", "r");
 	if (fp != NULL)
 	{
-	    while (fgets(buffer, 32, fp) != NULL)
+	    while (fgets(buffer, 32, fp) != NULL){
 	        printf("%s", buffer);
 	    	ret = buffer[0] - '0';
+	    }
 	    pclose(fp);
 	}
 	return ret;
@@ -122,6 +206,11 @@ std::string Utils::runCmd(const std::string& command)
 
     pclose(pPipe);
     return result;
+}
+
+int Utils::runSystem(std::string command)
+{
+    return system(command.c_str());
 }
 
 std::vector<std::string> Utils::getDirsInPath(const char* path){

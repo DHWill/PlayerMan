@@ -10,7 +10,7 @@
 
 
 Manager::Manager() {
-	findAWPaths();
+	hasPaths = findAWPaths();
 }
 
 Manager::~Manager() {
@@ -19,23 +19,36 @@ Manager::~Manager() {
 
 
 //check in here for legal files
-void Manager::findAWPaths(){
-    std::vector<std::string> awDirs = tools.getDirsInPath(dirAw.c_str());
-
-    for(auto subDir : awDirs){
-        std::string absFileLoc = dirAw + subDir + "/";
-        std::cout << "Found: " << absFileLoc << std::endl;
-        ArtworkInfo aw;
-
-        aw.awName = subDir;
-        aw.awVideo = absFileLoc + fileVideo;
-        aw.awJson = absFileLoc + fileJson;
-        aw.awSplash = absFileLoc + "sig.png";
-        aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
-        artworks.push_back(aw);
-    }
+bool Manager::findAWPaths() {
+	if (tools.dirStatus(dirAw.c_str())) {
+		std::vector<std::string> awDirs = tools.getDirsInPath(dirAw.c_str());
+		if (awDirs.size() > 0) {
+			for (auto subDir : awDirs) {
+				std::string absFileLoc = dirAw + subDir + "/";
+				std::cout << "Found: " << absFileLoc << std::endl;
+				ArtworkInfo aw;
+				aw.awName = subDir;
+				aw.awVideo = absFileLoc + fileVideo;
+				aw.awJson = absFileLoc + fileJson;
+				aw.awSplash = absFileLoc + "sig.png";
+				aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
+				artworks.push_back(aw);
+			}
+			return true;
+		}
+		else {
+			std::cout << "No sub-directories in: " << dirAw << std::endl;
+			return false;
+		}
+	}
+	else {
+		std::string makeDirCommand;
+		makeDirCommand = "mkdir " + dirAw;
+		std::cout << dirAw << " Does Not Exist, making it.. " << std::endl;
+		system(makeDirCommand.c_str());
+		return false;
+	}
 }
-
 void Manager::killPlayer(){
 	std::string command;
 	command = "killall " + filePlayer + " &";
@@ -51,7 +64,23 @@ void Manager::launchPlayer(ArtworkInfo awInfo){
 }
 void Manager::setAW(ArtworkInfo _artwork){
 	currentArtwork = _artwork;
+}
 
+
+bool Manager::copyFiles(std::string source, std::string destination){
+	std::string command;
+	command = "cp -r " + source + " " + destination;
+	int _ret = tools.runSystem(command);
+	std::cout << "system return" << _ret << std::endl;
+	return true;
+}
+
+bool Manager::removeFiles(std::string source){
+	std::string command;
+	command = "rm -r " + source;
+	int _ret = tools.runSystem(command);
+	std::cout << "system return" << _ret << std::endl;
+	return _ret;
 }
 
 Manager::ArtworkInfo Manager::getNextAW(){

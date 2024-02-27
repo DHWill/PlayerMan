@@ -26,10 +26,14 @@ public:
 	} ArtworkInfo;
 
 	Utils tools;
-	void findAWPaths();
+	bool findAWPaths();
 	void killPlayer();
 	void launchPlayer(ArtworkInfo awInfo);
 	void setAW(ArtworkInfo _artwork);
+	bool copyFiles(std::string source, std::string destination);
+	bool removeFiles(std::string source);
+
+	bool hasPaths = false;
 
 	ArtworkInfo getNextAW();
 	ArtworkInfo getAW(std::string name);
