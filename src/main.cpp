@@ -5,12 +5,15 @@
 #include <fstream>
 #include "Manager.h"
 #include <filesystem>
+#include "Networking/Networking.h"
 
 #include <ncurses.h>
 #include <iostream>
 
 typedef struct {
     Manager *awManager;
+    NetworkingMan *networkingMan;
+//    std::unique_ptr<std::thread> *networkListenerThread = nullptr;
     GtkWidget *window;
     GtkWidget *image;
 } gPointerData;
@@ -34,7 +37,6 @@ static gboolean launchArtwork(gpointer user_data){
 	std::cout << "launching: " << data->awManager->currentArtwork.awName << std::endl;
 	data->awManager->launchPlayer(data->awManager->currentArtwork);
 	data->awManager->is_changing = false;
-
 	return FALSE;
 }
 
@@ -62,12 +64,27 @@ static void open_message_dialog(gpointer user_data) {
 	gtk_widget_destroy (GTK_WIDGET(message_dialog));
 }
 
+//static gboolean startListenerThread(gpointer user_data){
+//	gPointerData* data = (gPointerData*) user_data;
+////	if(data->networkingMan->networkListenerThread && data->networkingMan->networkListenerThread->joinable()){
+////		data->networkingMan->networkListenerThread->join();
+////		data->networkListenerThread->reset(new std::thread(&Networking::udpListener, data->networkingMan));
+////	}
+//
+//	return TRUE;
+//}
+
 static gboolean pollForUpdate(gpointer user_data){
 	gPointerData *data = (gPointerData*) user_data;
 
 	if (!data->awManager->is_changing) {
-		int buttonStat = manUtils.readGPIOfs();
-		if (buttonStat == 0) {		//The button has been Pressed
+		std::string awToChangeTo = "";
+		if(data->networkingMan->isMessageReceived()){
+			awToChangeTo = data->networkingMan->messageReceived;
+			std::cout << awToChangeTo << std::endl;
+			data->networkingMan->startListening();
+		}
+		if (manUtils.readGPIOfs() == 0) {		//The button has been Pressed
 			Manager::ArtworkInfo artwork = data->awManager->getNextAW();
 			data->awManager->setAW(artwork);
 			showArtworkInfo(user_data);
@@ -151,7 +168,7 @@ static void activate(GtkApplication* app, gpointer user_data){
     //fullscreen
     data->window = gtk_application_window_new (app);
     gtk_window_set_title (GTK_WINDOW (data->window), "Window");
-    gtk_window_set_default_size (GTK_WINDOW (data->window), 2160, 3840);
+    gtk_window_set_default_size (GTK_WINDOW (data->window), 1920, 1920);
     gtk_window_fullscreen(GTK_WINDOW (data->window));
 
     //background
@@ -174,6 +191,7 @@ static void activate(GtkApplication* app, gpointer user_data){
 
 		g_timeout_add(guint(1000), showArtworkInfo, user_data);
 		g_timeout_add(guint(500), pollForUpdate, user_data);
+//		data->networkingMan->startListening();
 	}
 	else{
 		open_file_dialog(user_data);
@@ -191,9 +209,20 @@ int main (int argc,char **argv){
     Manager man;
     Manager *manager = &man;
 
+    NetworkingMan networking;
+    networking.startListening();
+
     gPointerData *data = g_new(gPointerData, 1);
+
+//    data->networkListenerThread->reset(new std::thread(&Networking::udpListener, networking));
+
+    NetworkingMan *netManager = &networking;
+    data->networkingMan = netManager;
     data->window = window;
     data->awManager = manager;
+//    data->networkingMan->startListening();
+//    std::unique_ptr<std::thread> *_networkListenerThreadPt = data->networkingMan->startListening();
+
 
     g_signal_connect(app, "activate", G_CALLBACK (activate), data);
 

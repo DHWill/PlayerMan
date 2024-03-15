@@ -70,22 +70,22 @@ bool Manager::copyFiles(std::string source, std::string destination){
 	std::string command;
 	command = "cp -r " + source + " " + destination;
 	int _ret = tools.runSystem(command);
-	std::cout << "system return" << _ret << std::endl;
+//	std::cout << "system return" << _ret << std::endl;
 	return (_ret == 0);
 }
 
 bool Manager::cleanUpFalseCopy(std::string awCopyPath){
 	size_t found = awCopyPath .find_last_of("/");
     std::string awSubFolder = awCopyPath.substr(found + 1);
-    removeFiles(dirAw +  awSubFolder);
-
+    int _ret = removeFiles(dirAw +  awSubFolder);
+    return (_ret == 0);
 }
 
 bool Manager::removeFiles(std::string source){
 	std::string command;
 	command = "rm -r " + source;
 	int _ret = tools.runSystem(command);
-	std::cout << "system return" << _ret << std::endl;
+//	std::cout << "system return" << _ret << std::endl;
 	return (_ret == 0);
 }
 

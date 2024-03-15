@@ -47,7 +47,7 @@ public:
 	std::vector<ArtworkInfo> artworks;
 	std::string dirApp = "/home/root/player/";
 	std::string dirSplash = dirApp + "sig.png";
-	std::string fileLauncher = "launcher.sh";
+	std::string fileLauncher = "awLauncher.sh";
 	std::string filePlayer = "bearPlayer";
 	std::string fileVideo = "Video.mp4";
 	std::string fileJson = "video_states.json";

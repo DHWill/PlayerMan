@@ -162,7 +162,7 @@ int Utils::readGPIOfs(){
 	if (fp != NULL)
 	{
 	    while (fgets(buffer, 32, fp) != NULL){
-	        printf("%s", buffer);
+//	        printf("%s", buffer);
 	    	ret = buffer[0] - '0';
 	    }
 	    pclose(fp);
