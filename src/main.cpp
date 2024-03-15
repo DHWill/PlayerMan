@@ -80,7 +80,7 @@ static gboolean pollForUpdate(gpointer user_data){
 	if (!data->awManager->is_changing) {
 		std::string awToChangeTo = "";
 		if(data->networkingMan->isMessageReceived()){
-			awToChangeTo = data->networkingMan->messageReceived;
+			awToChangeTo = data->networkingMan->receivedMessage();
 			std::cout << awToChangeTo << std::endl;
 			data->networkingMan->startListening();
 		}

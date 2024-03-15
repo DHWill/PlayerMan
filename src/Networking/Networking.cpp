@@ -13,15 +13,15 @@ Networking::Networking() {
 }
 
 Networking::~Networking() {
-	close(sockfd);
+//	close(sockfd);
 	// TODO Auto-generated destructor stub
 }
 
-void Networking::setup(){
+bool Networking::setup(){
     // Creating socket file descriptor
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         std::cerr << "socket creation failed" << std::endl;
-        return;
+        return false;
     }
 
     memset(&servaddr, 0, sizeof(servaddr));
@@ -36,12 +36,14 @@ void Networking::setup(){
     if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
         std::cerr << "bind failed" << std::endl;
         close(sockfd);
-        return;
+        return false;
     }
+    bound = true;
 
 }
 
 void Networking::udpListener() {
+	if(bound){
     hasReceivedMessage = false;
 
     char buffer[BUFFER_SIZE];
@@ -64,6 +66,10 @@ void Networking::udpListener() {
     message = buffer;
     hasReceivedMessage = true;
     mutex.unlock();
+	}
+	else {
+		setup();
+	}
 //    usleep(1000000);
 }
 
@@ -74,6 +80,10 @@ void NetworkingMan::startListening(){
 		networkListenerThread->join();
 	}
 	else {
+//		while(! _networking.setup()){
+//			usleep(100000)
+
+//		}
 		_networking.setup();
 	}
 	networkListenerThread.reset(new std::thread(&Networking::udpListener, &_networking));
@@ -95,6 +105,7 @@ std::string NetworkingMan::receivedMessage(){
 }
 
 std::string NetworkingMan::splitStrings(std::string _message, std::string delimiter){
+
 	size_t pos = 0;
 	std::string token;
 	while ((pos = _message.find(delimiter)) != std::string::npos) {
@@ -102,7 +113,7 @@ std::string NetworkingMan::splitStrings(std::string _message, std::string delimi
 	    std::cout << token << std::endl;
 	    _message.erase(0, pos + delimiter.length());
 	}
-	std::cout << _message << std::endl;
+	return _message;
 }
 
 

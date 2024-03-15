@@ -34,9 +34,10 @@ public:
 	Networking();
 	virtual ~Networking();
 	void udpListener();
-	void setup();
+	bool setup();
 	std::string message;
 	bool hasReceivedMessage = false;
+	bool bound = false;
 
 	int sockfd;
     struct sockaddr_in servaddr, cliaddr;
