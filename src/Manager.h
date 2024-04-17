@@ -41,6 +41,7 @@ public:
 	ArtworkInfo currentArtwork;
 
 	bool is_changing = false;
+	bool is_setup = false;
 
 
 	int awIndex = 0;

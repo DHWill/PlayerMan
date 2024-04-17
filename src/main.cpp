@@ -33,10 +33,13 @@ static gboolean killAW(gpointer user_data){
 
 static gboolean launchArtwork(gpointer user_data){
 	gPointerData* data = (gPointerData*)user_data;
-
-	std::cout << "launching: " << data->awManager->currentArtwork.awName << std::endl;
-	data->awManager->launchPlayer(data->awManager->currentArtwork);
-	data->awManager->is_changing = false;
+	if(!data->awManager->is_setup){
+		std::cout << "launching: " << data->awManager->currentArtwork.awName << std::endl;
+		data->awManager->launchPlayer(data->awManager->currentArtwork);
+		data->awManager->is_changing = false;
+		data->awManager->is_setup = false;
+		return FALSE;
+	}
 	return FALSE;
 }
 
@@ -102,6 +105,8 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 	gMessageDialogue *messageDialogue = g_new(gMessageDialogue, 1);
 	messageDialogue->dialog = GTK_DIALOG(chooser);
 	std::string _message = "";
+
+	//This is copy folder
 	if (response_id == GTK_RESPONSE_ACCEPT) {
 		if (data->awManager->copyFiles(filename, data->awManager->dirAw)) {
 			_message = "Copied " + std::string(filename) + " to: " + data->awManager->dirAw;
@@ -112,6 +117,7 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 		}
 	}
 
+	//This is delete folder
 	else if (response_id == GTK_RESPONSE_CANCEL) {
 		if (data->awManager->removeFiles(filename)) {
 			_message = "Removed " + std::string(filename);
@@ -120,6 +126,7 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 		}
 	}
 
+	//This is close file dialogue
 	else if (response_id == GTK_RESPONSE_DELETE_EVENT) {
 		_message = "Closing Artwork Copier, Launching Player.. ";
 		GtkWidget *image;
@@ -130,7 +137,9 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 		data->awManager->findAWPaths();
 		data->awManager->setAW(data->awManager->getNextAW());
 		data->awManager->is_changing = true;
+		data->awManager->is_setup = false;
 		data->image = image;
+
 
 		g_timeout_add(guint(1000), showArtworkInfo, user_data);
 		g_timeout_add(guint(500), pollForUpdate, user_data);
@@ -144,7 +153,6 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 
 static void open_file_dialog(gpointer user_data) {
 	gPointerData* data = (gPointerData*)user_data;
-
 	GtkWidget *dialog = gtk_file_chooser_dialog_new("Copy or Remove Artwork Folders",
 			GTK_WINDOW(data->window), GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER, "Delete",
 			GTK_RESPONSE_CANCEL, "Copy", GTK_RESPONSE_ACCEPT,
@@ -158,7 +166,18 @@ static void open_file_dialog(gpointer user_data) {
 	gtk_widget_show_all(dialog);
 }
 
+void key_press_event(  GtkEventControllerKey* self,guint keyval,guint keycode,GdkModifierType* state,gpointer user_data){
+	gPointerData* data = (gPointerData*)user_data;
+//	  if (state &(GDK_SHIFT_MASK | GDK_CONTROL_MASK)){
+		  if((keyval == GDK_KEY_S) && (!data->awManager->is_setup)){
+			  killAW(user_data);
+			  open_file_dialog(user_data);
+			  data->awManager->is_setup = true;
+//			  g_signal_handlers_disconnect_by_func(data->window, G_CALLBACK(key_press_event), user_data);
 
+//		  }
+	  }
+}
 
 static void activate(GtkApplication* app, gpointer user_data){
 
@@ -167,8 +186,11 @@ static void activate(GtkApplication* app, gpointer user_data){
 
     //fullscreen
     data->window = gtk_application_window_new (app);
-    gtk_window_set_title (GTK_WINDOW (data->window), "Window");
-    gtk_window_set_default_size (GTK_WINDOW (data->window), 1920, 1920);
+    gtk_window_set_title (GTK_WINDOW (data->window), "AW");
+    GdkRectangle workarea = {0};
+    gdk_monitor_get_workarea(gdk_display_get_primary_monitor(gdk_display_get_default()),&workarea);
+    gtk_window_set_default_size (GTK_WINDOW (data->window), workarea.width, workarea.height);
+//    gtk_window_set_default_size (GTK_WINDOW (data->window), 1280, 1024);
     gtk_window_fullscreen(GTK_WINDOW (data->window));
 
     //background
@@ -176,9 +198,7 @@ static void activate(GtkApplication* app, gpointer user_data){
 	gdk_rgba_parse(&color, "black");
 	gtk_widget_override_background_color(data->window, GTK_STATE_FLAG_NORMAL, &color);
 
-	//image
 
-	if(data->awManager->hasPaths){
 		GtkWidget *image;
 		image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
 		gtk_container_add(GTK_CONTAINER(data->window), image);
@@ -189,6 +209,12 @@ static void activate(GtkApplication* app, gpointer user_data){
 		data->awManager->is_changing = true;
 		data->image = image;
 
+		//Keybind
+    GtkEventController *event_controller;
+    event_controller = gtk_event_controller_key_new(data->window);
+    g_signal_connect(event_controller, "key-pressed",G_CALLBACK(key_press_event), data);
+
+	if(data->awManager->hasPaths && (!data->awManager->is_setup)){
 		g_timeout_add(guint(1000), showArtworkInfo, user_data);
 		g_timeout_add(guint(500), pollForUpdate, user_data);
 //		data->networkingMan->startListening();
@@ -210,7 +236,7 @@ int main (int argc,char **argv){
     Manager *manager = &man;
 
     NetworkingMan networking;
-    networking.startListening();
+//    networking.startListening();
 
     gPointerData *data = g_new(gPointerData, 1);
 
