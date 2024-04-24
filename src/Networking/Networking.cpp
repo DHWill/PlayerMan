@@ -23,6 +23,12 @@ bool Networking::setup(){
         std::cerr << "socket creation failed" << std::endl;
         return false;
     }
+    int broadcastEnable=1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable)) < 0) {
+        std::cerr << "Error setting broadcast option\n";
+        close(sockfd);
+        return 1;
+    }
 
     memset(&servaddr, 0, sizeof(servaddr));
     memset(&cliaddr, 0, sizeof(cliaddr));
