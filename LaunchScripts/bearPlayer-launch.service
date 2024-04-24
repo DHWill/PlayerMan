@@ -1,0 +1,18 @@
+[Unit]
+Description=Launch the bearPlayer
+After=weston.service
+Requires=weston.service
+
+[Service]
+Restart=on-failure
+Type=fork
+#WorkingDirectory=/home/root/player/
+Environment=WAYLAND_DISPLAY=/run/wayland-0
+ExecStart=/bin/bash /home/root/player/start.sh
+#KillMode=mixed
+RestartSec=1
+#User=root
+
+[Install]
+WantedBy=multi-user.target
+

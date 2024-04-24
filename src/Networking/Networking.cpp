@@ -53,14 +53,14 @@ void Networking::udpListener() {
 
     // Receive the message from the client
     n = recvfrom(sockfd, (char *)buffer, BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&cliaddr, (socklen_t *)&len);
-    buffer[n] = '\0';
+    buffer[n] = '\0';	//null terminate message
+
+    std::cout << "Received message: " << buffer << std::endl;
+
 
     // Check if the received message is correct
-    if (strcmp(buffer, "AW") == 0) {
-        std::cout << "Received correct message: " << buffer << std::endl;
-    } else {
-        std::cout << "Received incorrect message: " << buffer << std::endl;
-    }
+//    int nCheck = strcmp(buffer, "AW\n");
+//    if (nCheck > 0) {
 
     mutex.lock();
     message = buffer;
@@ -77,6 +77,7 @@ void Networking::udpListener() {
 
 void NetworkingMan::startListening(){
 	if((networkListenerThread) && (networkListenerThread->joinable())){
+		messageReceived = _networking.message;
 		networkListenerThread->join();
 	}
 	else {
@@ -98,22 +99,44 @@ bool NetworkingMan::isMessageReceived(){
 	return _ret;
 }
 
-std::string NetworkingMan::receivedMessage(){
-	std::string delimiter = "---LAM_UDP_MESSAGE---";
-	splitStrings(messageReceived, delimiter);
-	return messageReceived;
+NetworkingMan::awInfo NetworkingMan::receivedMessage(){
+	awInfo _awInfo;
+//    std::string udpMessage = "GROUP_00--UPDATE_INDEX=Zeus";
+//To Test 'echo GROUP_00--UPDATE_INDEX=Zeus | nc -u -w1 192.168.1.131 8080'
+
+    std::cout << "messageReceived "<< _networking.message << std::endl;
+    std::vector<std::string> parsedMessage = splitStrings(messageReceived, "--");
+
+    if(parsedMessage.size() > 1){
+        std::vector<std::string> groupName = splitStrings(parsedMessage[0], "_");
+        if(groupName.size()){
+            _awInfo.groupName = groupName[1];
+        }
+        std::vector<std::string> awPath = splitStrings(parsedMessage[1], "=");
+        if(awPath.size()){
+            _awInfo.awPath = awPath[1];
+        }
+        std::cout << "GroupName:" << _awInfo.groupName << " | AWPath:" << _awInfo.awPath << std::endl;
+    }
+	return _awInfo;
 }
 
-std::string NetworkingMan::splitStrings(std::string _message, std::string delimiter){
 
-	size_t pos = 0;
-	std::string token;
-	while ((pos = _message.find(delimiter)) != std::string::npos) {
-	    token = _message.substr(0, pos);
-	    std::cout << token << std::endl;
-	    _message.erase(0, pos + delimiter.length());
-	}
-	return _message;
+std::vector<std::string> NetworkingMan::splitStrings(std::string message, std::string delimiter){
+    std::vector<std::string> splitStrings;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = message.find(delimiter)) != std::string::npos) {
+        token = message.substr(0, pos);
+        splitStrings.push_back(token);
+        message.erase(0, pos + delimiter.length());
+    }
+    splitStrings.push_back(message);
+    return splitStrings;
 }
+
+
+
+
 
 

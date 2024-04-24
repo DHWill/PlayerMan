@@ -81,10 +81,15 @@ static gboolean pollForUpdate(gpointer user_data){
 	gPointerData *data = (gPointerData*) user_data;
 
 	if (!data->awManager->is_changing) {
-		std::string awToChangeTo = "";
 		if(data->networkingMan->isMessageReceived()){
-			awToChangeTo = data->networkingMan->receivedMessage();
-			std::cout << awToChangeTo << std::endl;
+			NetworkingMan::awInfo _awInfo;
+			_awInfo = data->networkingMan->receivedMessage();
+			std::cout << "GroupName: "<<_awInfo.groupName << std::endl;
+			std::cout << "AWPath: "<<_awInfo.awPath << std::endl;
+			Manager::ArtworkInfo artwork = data->awManager->getAW(_awInfo.awPath);
+			data->awManager->setAW(artwork);
+			showArtworkInfo(user_data);
+			data->awManager->is_changing = true;
 			data->networkingMan->startListening();
 		}
 		if (manUtils.readGPIOfs() == 0) {		//The button has been Pressed
@@ -217,7 +222,7 @@ static void activate(GtkApplication* app, gpointer user_data){
 	if(data->awManager->hasPaths && (!data->awManager->is_setup)){
 		g_timeout_add(guint(1000), showArtworkInfo, user_data);
 		g_timeout_add(guint(500), pollForUpdate, user_data);
-//		data->networkingMan->startListening();
+		data->networkingMan->startListening();
 	}
 	else{
 		open_file_dialog(user_data);

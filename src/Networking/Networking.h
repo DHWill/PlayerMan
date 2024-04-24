@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <mutex>
+#include <vector>
 //#include <glib.h>
 
 #define PORT 8080
@@ -23,11 +24,7 @@
 #define KEY_UPDATE_INDEX "UPDATE_INDEX"
 #define MSG_HEADER "---LAM_UDP_MESSAGE---"
 
-typedef struct {
-	bool validMessage = false;
-	std::string message = "";
 
-} messageReceived;
 
 class Networking {
 public:
@@ -47,15 +44,22 @@ public:
 };
 
 class NetworkingMan{
+
 public:
 	Networking _networking;
-	std::string splitStrings(std::string _message, std::string delimiter);
+	std::vector<std::string> splitStrings(std::string message, std::string delimiter);
 	std::string messageReceived;
 	bool isMessageReceived();
 	void startListening();
 	std::unique_ptr<std::thread> networkListenerThread = nullptr;
 //	GThread thread()
-	std::string receivedMessage();
+
+	struct awInfo {
+	    std::string groupName = "";
+	    std::string awPath = "";
+	};
+
+	awInfo receivedMessage();
 };
 
 #endif /* NETWORKING_NETWORKING_H_ */
