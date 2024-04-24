@@ -17,7 +17,7 @@
 #include <vector>
 //#include <glib.h>
 
-#define PORT 8080
+#define PORT 6006
 #define BUFFER_SIZE 1024
 #define MESSAGE "Hello from client"
 
