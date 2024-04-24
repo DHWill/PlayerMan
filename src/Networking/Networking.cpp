@@ -102,7 +102,7 @@ bool NetworkingMan::isMessageReceived(){
 NetworkingMan::awInfo NetworkingMan::receivedMessage(){
 	awInfo _awInfo;
 //    std::string udpMessage = "GROUP_00--UPDATE_INDEX=Zeus";
-//To Test 'echo GROUP_00--UPDATE_INDEX=Zeus | nc -u -w1 192.168.1.131 8080'
+//To Test 'echo GROUP_00--UPDATE_INDEX=Atlas | tr -d '\n' | nc -u -w1 192.168.1.131 8080'
 
     std::cout << "messageReceived "<< _networking.message << std::endl;
     std::vector<std::string> parsedMessage = splitStrings(messageReceived, "--");
