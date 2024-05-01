@@ -28,6 +28,7 @@ bool Manager::findAWPaths() {
 				std::cout << "Found: " << absFileLoc << std::endl;
 				ArtworkInfo aw;
 				aw.awName = subDir;
+				aw.awExec = absFileLoc + filePlayer;
 				aw.awVideo = absFileLoc + fileVideo;
 				aw.awJson = absFileLoc + fileJson;
 				aw.awSplash = absFileLoc + "sig.png";
@@ -58,7 +59,7 @@ void Manager::killPlayer(){
 
 void Manager::launchPlayer(ArtworkInfo awInfo){
 	std::string command;
-	command = dirApp + fileLauncher + " " + awInfo.awVideo + " " + awInfo.awJson + " &";
+	command = dirApp + fileLauncher + " " + awInfo.awExec + " " + awInfo.awVideo + " " + awInfo.awJson + " &";
 	system(command.c_str());
 
 }

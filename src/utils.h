@@ -19,6 +19,7 @@ class Utils
 public:
     Utils();
     void pollGPIO();
+    int readADC_MV();
     void readFile(std::string file);
     std::vector<std::string> getDirsInPath(const char* path);
     std::string runCmd(const std::string& command);

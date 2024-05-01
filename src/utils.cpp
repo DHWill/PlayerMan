@@ -170,6 +170,23 @@ int Utils::readGPIOfs(){
 	return ret;
 }
 
+int Utils::readADC_MV(){
+	FILE *fp;
+	char buffer[32];
+	int ret = -1;
+	fp = popen("cat /dev/apalis-adc0", "r");
+	if (fp != NULL)
+	{
+	    while (fgets(buffer, 32, fp) != NULL){
+//	        printf("%s", buffer);
+	    	ret = buffer[0] - '0';
+	    }
+	    pclose(fp);
+	}
+	return ret;
+
+}
+
 
 void Utils::readFile(std::string file){
     // Create a text string, which is used to output the text file

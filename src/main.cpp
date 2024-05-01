@@ -13,7 +13,6 @@
 typedef struct {
     Manager *awManager;
     NetworkingMan *networkingMan;
-//    std::unique_ptr<std::thread> *networkListenerThread = nullptr;
     GtkWidget *window;
     GtkWidget *image;
 } gPointerData;

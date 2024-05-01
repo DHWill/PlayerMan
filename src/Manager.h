@@ -18,6 +18,7 @@ public:
 	virtual ~Manager();
 
 	typedef struct {
+		std::string awExec;
 		std::string awVideo;
 		std::string awJson;
 		std::string awSplash;
