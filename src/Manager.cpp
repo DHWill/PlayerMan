@@ -20,6 +20,9 @@ Manager::~Manager() {
 
 //check in here for legal files
 bool Manager::findAWPaths() {
+	if(artworks.size() < size_t(0)){
+		artworks.clear();
+	}
 	if (tools.dirStatus(dirAw.c_str())) {
 		std::vector<std::string> awDirs = tools.getDirsInPath(dirAw.c_str());
 		if (awDirs.size() > 0) {
@@ -35,10 +38,12 @@ bool Manager::findAWPaths() {
 				aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
 				artworks.push_back(aw);
 			}
+			hasPaths = true;
 			return true;
 		}
 		else {
 			std::cout << "No sub-directories in: " << dirAw << std::endl;
+			hasPaths = false;
 			return false;
 		}
 	}
@@ -47,6 +52,7 @@ bool Manager::findAWPaths() {
 		makeDirCommand = "mkdir " + dirAw;
 		std::cout << dirAw << " Does Not Exist, making it.. " << std::endl;
 		system(makeDirCommand.c_str());
+		hasPaths = false;
 		return false;
 	}
 }

@@ -86,13 +86,13 @@ void NetworkingMan::startListening(){
 		messageReceived = _networking.message;
 		networkListenerThread->join();
 	}
-	else {
-//		while(! _networking.setup()){
-//			usleep(100000)
-
-//		}
-		_networking.setup();
-	}
+//	else {
+////		while(! _networking.setup()){
+////			usleep(100000)
+//
+////		}
+//		_networking.setup();
+//	}
 	networkListenerThread.reset(new std::thread(&Networking::udpListener, &_networking));
 }
 

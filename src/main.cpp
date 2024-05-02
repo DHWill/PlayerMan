@@ -46,9 +46,9 @@ static gboolean showArtworkInfo(gpointer user_data){
 	gPointerData* data = (gPointerData*)user_data;
 
 	std::cout << "showing splash: " << data->awManager->currentArtwork.awSplash << std::endl;
+//	gtk_widget_show_all(data->window);
 	gtk_image_set_from_pixbuf(GTK_IMAGE(data->image), data->awManager->currentArtwork.splashPixBuf);
 	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
-	gtk_widget_show_all(data->window);
 	killAW(user_data);
 //	gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
 //	gtk_widget_show_all(data->window);
@@ -78,26 +78,28 @@ static void open_message_dialog(gpointer user_data) {
 
 static gboolean pollForUpdate(gpointer user_data){
 	gPointerData *data = (gPointerData*) user_data;
-
-	if (!data->awManager->is_changing) {
-		if(data->networkingMan->isMessageReceived()){
-			NetworkingMan::awInfo _awInfo;
-			_awInfo = data->networkingMan->receivedMessage();
-			std::cout << "GroupName: "<<_awInfo.groupName << std::endl;
-			std::cout << "AWPath: "<<_awInfo.awPath << std::endl;
-			Manager::ArtworkInfo artwork = data->awManager->getAW(_awInfo.awPath);
-			data->awManager->setAW(artwork);
-			showArtworkInfo(user_data);
-			data->awManager->is_changing = true;
-			data->networkingMan->startListening();
-		}
-		if (manUtils.readGPIOfs() == 0) {		//The button has been Pressed
-			Manager::ArtworkInfo artwork = data->awManager->getNextAW();
-			data->awManager->setAW(artwork);
-			showArtworkInfo(user_data);
-			data->awManager->is_changing = true;
+	if(data->awManager->hasPaths){
+		if (!data->awManager->is_changing && !data->awManager->is_setup) {
+			if(data->networkingMan->isMessageReceived()){
+				NetworkingMan::awInfo _awInfo;
+				_awInfo = data->networkingMan->receivedMessage();
+				std::cout << "GroupName: "<<_awInfo.groupName << std::endl;
+				std::cout << "AWPath: "<<_awInfo.awPath << std::endl;
+				Manager::ArtworkInfo artwork = data->awManager->getAW(_awInfo.awPath);
+				data->awManager->setAW(artwork);
+				showArtworkInfo(user_data);
+				data->awManager->is_changing = true;
+				data->networkingMan->startListening();
+			}
+			if (manUtils.readGPIOfs() == 0) {		//The button has been Pressed
+				Manager::ArtworkInfo artwork = data->awManager->getNextAW();
+				data->awManager->setAW(artwork);
+				showArtworkInfo(user_data);
+				data->awManager->is_changing = true;
 //			return FALSE;
+			}
 		}
+
 	}
     return TRUE;
 }
@@ -120,6 +122,8 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 			std::string awCopyPath = std::string(filename);
 			data->awManager->cleanUpFalseCopy(awCopyPath);
 		}
+		messageDialogue->message = (gchar*) _message.c_str();
+		open_message_dialog(messageDialogue);
 	}
 
 	//This is delete folder
@@ -129,31 +133,32 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 		} else {
 			_message = "Could NOT Remove " + std::string(filename);
 		}
+		messageDialogue->message = (gchar*) _message.c_str();
+		open_message_dialog(messageDialogue);
 	}
 
 	//This is close file dialogue
-	else if (response_id == GTK_RESPONSE_DELETE_EVENT) {
-		_message = "Closing Artwork Copier, Launching Player.. ";
-		GtkWidget *image;
-		image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
-		gtk_container_add(GTK_CONTAINER(data->window), image);
-		gtk_widget_show_all(data->window);
-		gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
-		data->awManager->findAWPaths();
-		data->awManager->setAW(data->awManager->getNextAW());
-		data->awManager->is_changing = true;
+	else if (response_id == GTK_RESPONSE_DELETE_EVENT) {;
+		if(data->awManager->findAWPaths()){
+			_message = "Closing Artwork Copier, Launching Player.. Reboot For Network";
+			messageDialogue->message = (gchar*) _message.c_str();
+			open_message_dialog(messageDialogue);
+
+			data->awManager->setAW(data->awManager->getNextAW());
+			data->awManager->is_changing = true;
+			g_timeout_add(guint(1000), showArtworkInfo, user_data);
+
+		}
+		else{
+			_message = "No Artworks in AW Directory.. Press Shift + S";
+			messageDialogue->message = (gchar*) _message.c_str();
+			open_message_dialog(messageDialogue);
+
+		}
 		data->awManager->is_setup = false;
-		data->image = image;
-
-
-		g_timeout_add(guint(1000), showArtworkInfo, user_data);
-		g_timeout_add(guint(500), pollForUpdate, user_data);
+		gtk_widget_show_all(data->window);	//to kepp keybind open
 	}
-	messageDialogue->message = (gchar*) _message.c_str();
-	open_message_dialog(messageDialogue);
 	g_free(filename);
-//	g_free(data);
-//	g_free(messageDialogue);
 }
 
 static void open_file_dialog(gpointer user_data) {
@@ -204,29 +209,28 @@ static void activate(GtkApplication* app, gpointer user_data){
 	gtk_widget_override_background_color(data->window, GTK_STATE_FLAG_NORMAL, &color);
 
 
-		GtkWidget *image;
-		image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
-		gtk_container_add(GTK_CONTAINER(data->window), image);
-		gtk_widget_show_all(data->window);
-		gtk_window_set_keep_above(GTK_WINDOW(data->window), TRUE);
 		//launchAW
-		data->awManager->setAW(data->awManager->getNextAW());
-		data->awManager->is_changing = true;
-		data->image = image;
 
 		//Keybind
-    GtkEventController *event_controller;
-    event_controller = gtk_event_controller_key_new(data->window);
-    g_signal_connect(event_controller, "key-pressed",G_CALLBACK(key_press_event), data);
+
+	GtkEventController *event_controller;
+	event_controller = gtk_event_controller_key_new(data->window);
+	g_signal_connect(event_controller, "key-pressed",G_CALLBACK(key_press_event), data);
+	GtkWidget *image;
+	image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
+	gtk_container_add(GTK_CONTAINER(data->window), image);
+	data->image = image;
 
 	if(data->awManager->hasPaths && (!data->awManager->is_setup)){
+		data->awManager->setAW(data->awManager->getNextAW());
+		data->awManager->is_changing = true;
 		g_timeout_add(guint(1000), showArtworkInfo, user_data);
-		g_timeout_add(guint(500), pollForUpdate, user_data);
-		data->networkingMan->startListening();
+		gtk_widget_show_all(data->window);
 	}
 	else{
 		open_file_dialog(user_data);
 	}
+	g_timeout_add(guint(500), pollForUpdate, user_data);
 }
 
 
@@ -251,6 +255,7 @@ int main (int argc,char **argv){
     data->networkingMan = netManager;
     data->window = window;
     data->awManager = manager;
+	data->networkingMan->startListening();
 //    data->networkingMan->startListening();
 //    std::unique_ptr<std::thread> *_networkListenerThreadPt = data->networkingMan->startListening();
 
