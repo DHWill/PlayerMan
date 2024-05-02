@@ -34,6 +34,7 @@ public:
 	bool copyFiles(std::string source, std::string destination);
 	bool removeFiles(std::string source);
 	bool cleanUpFalseCopy(std::string source);
+	bool makeFolderExecutable(std::string destination);
 
 	bool hasPaths = false;
 

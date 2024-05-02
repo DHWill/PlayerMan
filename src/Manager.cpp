@@ -69,9 +69,20 @@ void Manager::setAW(ArtworkInfo _artwork){
 
 bool Manager::copyFiles(std::string source, std::string destination){
 	std::string command;
-	command = "cp -r " + source + " " + destination;
+	command = "cp -rp " + source + " " + destination;
 	int _ret = tools.runSystem(command);
 //	std::cout << "system return" << _ret << std::endl;
+	return (_ret == 0);
+}
+
+bool Manager::makeFolderExecutable(std::string awCopyPath){
+	size_t found = awCopyPath .find_last_of("/");
+    std::string awSubFolder = awCopyPath.substr(found + 1);
+    std::string destination = dirAw +  awSubFolder;
+    std::string command = "";
+	command = "chmod +x " + destination + "/*";
+	int _ret = tools.runSystem(command);
+	std::cout << command << _ret << std::endl;
 	return (_ret == 0);
 }
 
