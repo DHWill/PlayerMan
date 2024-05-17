@@ -28,7 +28,6 @@ bool Manager::findAWPaths() {
 		if (awDirs.size() > 0) {
 			for (auto subDir : awDirs) {
 				std::string absFileLoc = dirAw + subDir + "/";
-				std::cout << "Found: " << absFileLoc << std::endl;
 				ArtworkInfo aw;
 				aw.awName = subDir;
 				aw.awExec = absFileLoc + filePlayer;
@@ -36,9 +35,19 @@ bool Manager::findAWPaths() {
 				aw.awJson = absFileLoc + fileJson;
 				aw.awSplash = absFileLoc + "sig.png";
 				aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
+				aw.awOrder = getOrder(absFileLoc + "position.txt");
 				artworks.push_back(aw);
 			}
 			hasPaths = true;
+
+		    std::sort(artworks.begin(), artworks.end(), [](const ArtworkInfo& a, const ArtworkInfo& b) {
+		        return a.awOrder < b.awOrder;
+		    });
+
+		    for(auto artwork : artworks){
+		    	std::cout << "sorted: " << artwork.awOrder << " " << artwork.awName << std::endl;
+		    }
+
 			return true;
 		}
 		else {
@@ -60,7 +69,16 @@ void Manager::killPlayer(){
 	std::string command;
 	command = "killall " + filePlayer + " &";
 	system(command.c_str());
+}
 
+int Manager::getOrder(std::string orderFilePath){
+	int orderN = 0;
+	std::vector<std::string> orderFile = tools.readFileByLine(orderFilePath);
+	if(orderFile.size() > size_t(0)){
+
+		orderN = std::stoi(orderFile[0]);
+	}
+	return orderN;
 }
 
 void Manager::launchPlayer(ArtworkInfo awInfo){

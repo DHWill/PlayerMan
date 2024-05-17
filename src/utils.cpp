@@ -158,7 +158,7 @@ int Utils::readGPIOfs(){
 	FILE *fp;
 	char buffer[32];
 	int ret = -1;
-	fp = popen("gpioget 2 8", "r");
+	fp = popen("gpioget 2 12", "r");	//MMX GPIO3 -> Button
 	if (fp != NULL)
 	{
 	    while (fgets(buffer, 32, fp) != NULL){
@@ -188,21 +188,20 @@ int Utils::readADC_MV(){
 }
 
 
-void Utils::readFile(std::string file){
+std::vector<std::string> Utils::readFileByLine(std::string file){
     // Create a text string, which is used to output the text file
-    std::string myText;
-
-    // Read from the text file
+    std::string line;
+    std::vector<std::string> _ret;
     std::ifstream MyReadFile(file);
-
-    // Use a while loop together with the getline() function to read the file line by line
-    while (getline (MyReadFile, myText)) {
+    while (getline (MyReadFile, line)) {
         // Output the text from the file
-        std::cout << myText;
+        std::cout << line << std::endl;
+    	_ret.push_back(line);
     }
 
     // Close the file
     MyReadFile.close();
+    return _ret;
 }
 
 std::string Utils::runCmd(const std::string& command)

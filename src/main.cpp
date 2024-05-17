@@ -96,7 +96,6 @@ static gboolean pollForUpdate(gpointer user_data){
 				data->awManager->setAW(artwork);
 				showArtworkInfo(user_data);
 				data->awManager->is_changing = true;
-//			return FALSE;
 			}
 		}
 
@@ -140,20 +139,17 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 	//This is close file dialogue
 	else if (response_id == GTK_RESPONSE_DELETE_EVENT) {;
 		if(data->awManager->findAWPaths()){
-			_message = "Closing Artwork Copier, Launching Player.. Reboot For Network";
+			_message = "Closing Artwork Copier, Launching Player..";
 			messageDialogue->message = (gchar*) _message.c_str();
 			open_message_dialog(messageDialogue);
-
 			data->awManager->setAW(data->awManager->getNextAW());
 			data->awManager->is_changing = true;
-			g_timeout_add(guint(1000), showArtworkInfo, user_data);
-
+			g_timeout_add(guint(1000), showArtworkInfo, user_data);	//Launch AW on close
 		}
 		else{
 			_message = "No Artworks in AW Directory.. Press Shift + S";
 			messageDialogue->message = (gchar*) _message.c_str();
 			open_message_dialog(messageDialogue);
-
 		}
 		data->awManager->is_setup = false;
 		gtk_widget_show_all(data->window);	//to kepp keybind open
@@ -178,15 +174,11 @@ static void open_file_dialog(gpointer user_data) {
 
 void key_press_event(  GtkEventControllerKey* self,guint keyval,guint keycode,GdkModifierType* state,gpointer user_data){
 	gPointerData* data = (gPointerData*)user_data;
-//	  if (state &(GDK_SHIFT_MASK | GDK_CONTROL_MASK)){
-		  if((keyval == GDK_KEY_S) && (!data->awManager->is_setup)){
-			  killAW(user_data);
-			  open_file_dialog(user_data);
-			  data->awManager->is_setup = true;
-//			  g_signal_handlers_disconnect_by_func(data->window, G_CALLBACK(key_press_event), user_data);
-
-//		  }
-	  }
+	if((keyval == GDK_KEY_S) && (!data->awManager->is_setup)){
+		killAW(user_data);
+		open_file_dialog(user_data);
+		data->awManager->is_setup = true;
+	}
 }
 
 static void activate(GtkApplication* app, gpointer user_data){
@@ -194,7 +186,7 @@ static void activate(GtkApplication* app, gpointer user_data){
 	pollForUpdate(user_data);
     gPointerData* data =  (gPointerData*)user_data;
 
-    //fullscreen
+    //Fullscreen
     data->window = gtk_application_window_new (app);
     gtk_window_set_title (GTK_WINDOW (data->window), "AW");
     GdkRectangle workarea = {0};
@@ -203,19 +195,17 @@ static void activate(GtkApplication* app, gpointer user_data){
 //    gtk_window_set_default_size (GTK_WINDOW (data->window), 1280, 1024);
     gtk_window_fullscreen(GTK_WINDOW (data->window));
 
-    //background
+    //Background
     GdkRGBA color;
 	gdk_rgba_parse(&color, "black");
 	gtk_widget_override_background_color(data->window, GTK_STATE_FLAG_NORMAL, &color);
 
-
-		//launchAW
-
-		//Keybind
-
+	//Keybind
 	GtkEventController *event_controller;
 	event_controller = gtk_event_controller_key_new(data->window);
 	g_signal_connect(event_controller, "key-pressed",G_CALLBACK(key_press_event), data);
+
+	//Create Image for PixBuff
 	GtkWidget *image;
 	image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
 	gtk_container_add(GTK_CONTAINER(data->window), image);
@@ -249,15 +239,12 @@ int main (int argc,char **argv){
 
     gPointerData *data = g_new(gPointerData, 1);
 
-//    data->networkListenerThread->reset(new std::thread(&Networking::udpListener, networking));
 
     NetworkingMan *netManager = &networking;
     data->networkingMan = netManager;
     data->window = window;
     data->awManager = manager;
 	data->networkingMan->startListening();
-//    data->networkingMan->startListening();
-//    std::unique_ptr<std::thread> *_networkListenerThreadPt = data->networkingMan->startListening();
 
 
     g_signal_connect(app, "activate", G_CALLBACK (activate), data);

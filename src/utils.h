@@ -20,7 +20,7 @@ public:
     Utils();
     void pollGPIO();
     int readADC_MV();
-    void readFile(std::string file);
+    std::vector<std::string> readFileByLine(std::string file);
     std::vector<std::string> getDirsInPath(const char* path);
     std::string runCmd(const std::string& command);
     bool doesFileExist(const std::string& name);

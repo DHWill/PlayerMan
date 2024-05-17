@@ -9,6 +9,8 @@
 #define MANAGER_H_
 #include <vector>
 #include <gdk.h>
+#include <deque>
+#include <algorithm>
 
 #include "utils.h"
 
@@ -23,6 +25,7 @@ public:
 		std::string awJson;
 		std::string awSplash;
 		std::string awName;
+		int awOrder;
 		GdkPixbuf *splashPixBuf;
 	} ArtworkInfo;
 
@@ -35,6 +38,7 @@ public:
 	bool removeFiles(std::string source);
 	bool cleanUpFalseCopy(std::string source);
 	bool makeFolderExecutable(std::string destination);
+	int getOrder(std::string orderFilePath);
 
 	bool hasPaths = false;
 
