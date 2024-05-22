@@ -184,7 +184,6 @@ int Utils::readADC_MV(){
 	    pclose(fp);
 	}
 	return ret;
-
 }
 
 
@@ -251,4 +250,38 @@ bool Utils::doesFileExist(const std::string& name){
     } else {
         return false;
     }
+}
+
+//std::string Utils::getSataMountPoint() {
+//    std::array<char, 128> buffer;
+//    std::string result;
+//    std::string command=""lsblk -do name,tran,mountpoint | grep sata | awk '{print $3}'";
+//    // Open the command for reading
+//    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+//    if (!pipe) {
+//        throw std::runtime_error("popen() failed!");
+//    }
+//    // Read the output a line at a time
+//    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+//        result += buffer.data();
+//    }
+//    return result;
+//}
+
+std::string Utils::getSataMountPoint(){
+	//This just returns first Sata mountpoint, we only have the one on the IMX8
+	FILE *fp;
+	std::string _ret;
+	char buffer[128];
+	fp = popen("lsblk -do name,tran,mountpoint | grep sata | awk '{print $3}'", "r");
+	if (fp != nullptr){
+	    while (fgets(buffer, sizeof(buffer) ,fp) != nullptr){
+	    	_ret += buffer;
+	    }
+	    if(_ret.size() > 0){
+	    	_ret.pop_back();	//remove \r
+	    }
+	}
+	pclose(fp);
+	return _ret;
 }

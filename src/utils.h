@@ -28,6 +28,8 @@ public:
 //    void chechDirStatus(const std::filesystem::path& p, std::filesystem::file_status s);
     bool dirStatus(const char* pathname);
     int runSystem(std::string command);
+    std::string getSataMountPoint();
+
 //    void dirStatus();
 
 

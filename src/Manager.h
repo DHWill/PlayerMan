@@ -38,6 +38,7 @@ public:
 	bool removeFiles(std::string source);
 	bool cleanUpFalseCopy(std::string source);
 	bool makeFolderExecutable(std::string destination);
+	bool makeFileExecutable(std::string file);
 	int getOrder(std::string orderFilePath);
 
 	bool hasPaths = false;

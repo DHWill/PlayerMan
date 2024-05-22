@@ -115,12 +115,13 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 	if (response_id == GTK_RESPONSE_ACCEPT) {
 		if (data->awManager->copyFiles(filename, data->awManager->dirAw)) {
 			_message = "Copied " + std::string(filename) + " to: " + data->awManager->dirAw;
-			data->awManager->makeFolderExecutable(std::string(filename));
+//			data->awManager->makeFolderExecutable(std::string(filename));
 		} else {
 			_message = "Error in Copying " + std::string(filename) + " to: " + data->awManager->dirAw + "cleaning up.. ";
 			std::string awCopyPath = std::string(filename);
 			data->awManager->cleanUpFalseCopy(awCopyPath);
 		}
+		data->awManager->findAWPaths();
 		messageDialogue->message = (gchar*) _message.c_str();
 		open_message_dialog(messageDialogue);
 	}
@@ -166,6 +167,7 @@ static void open_file_dialog(gpointer user_data) {
 	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "/home/root/", NULL);
 	gtk_file_chooser_remove_shortcut_folder(GTK_FILE_CHOOSER(dialog), "recent", NULL);
 	gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(dialog), data->awManager->dirAw.c_str(), NULL);
+	gtk_file_chooser_add_shortcut_folder(GTK_FILE_CHOOSER(dialog), data->awManager->dirAwMSata.c_str(), NULL);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),data->awManager->dirAw.c_str());
 
 	g_signal_connect(dialog, "response", G_CALLBACK(on_file_selected), user_data);
