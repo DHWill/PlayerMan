@@ -20,6 +20,7 @@ Manager::~Manager() {
 
 //check in here for legal files
 bool Manager::findAWPaths() {
+	hasPaths = false;
 	if(artworks.size() < size_t(0)){
 		artworks.clear();
 	}
@@ -38,30 +39,61 @@ bool Manager::findAWPaths() {
 				aw.awOrder = getOrder(absFileLoc + "position.txt");
 				artworks.push_back(aw);
 			}
-			hasPaths = true;
-
-		    std::sort(artworks.begin(), artworks.end(), [](const ArtworkInfo& a, const ArtworkInfo& b) {
-		        return a.awOrder < b.awOrder;
-		    });
-
-		    for(auto artwork : artworks){
-		    	std::cout << "sorted: " << artwork.awOrder << " " << artwork.awName << std::endl;
-		    }
-
-			return true;
-		}
-		else {
-			std::cout << "No sub-directories in: " << dirAw << std::endl;
-			hasPaths = false;
-			return false;
+			hasPaths |= true;
 		}
 	}
+
 	else {
 		std::string makeDirCommand;
 		makeDirCommand = "mkdir " + dirAw;
 		std::cout << dirAw << " Does Not Exist, making it.. " << std::endl;
 		system(makeDirCommand.c_str());
-		hasPaths = false;
+		hasPaths |= false;
+	}
+
+	if (tools.dirStatus(dirAwMSata.c_str())) {
+		std::vector<std::string> awDirs = tools.getDirsInPath(dirAwMSata.c_str());
+		if (awDirs.size() > 0) {
+			for (auto subDir : awDirs) {
+				std::string absFileLoc = dirAwMSata + subDir + "/";
+				ArtworkInfo aw;
+				aw.awName = subDir;
+				aw.awExec = absFileLoc + filePlayer;
+				aw.awVideo = absFileLoc + fileVideo;
+				aw.awJson = absFileLoc + fileJson;
+				aw.awSplash = absFileLoc + "sig.png";
+				aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
+				aw.awOrder = getOrder(absFileLoc + "position.txt");
+				artworks.push_back(aw);
+			}
+			hasPaths |= true;
+		}
+	}
+
+	else {
+		std::string makeDirCommand;
+		makeDirCommand = "mkdir " + dirAwMSata;
+		std::cout << dirAwMSata << " Does Not Exist, attempting to make it.. " << std::endl;
+		if(system(makeDirCommand.c_str())){
+			std::cout << "Detected mSATA, made " << dirAwMSata << std::endl;
+		}
+		hasPaths |= false;
+	}
+
+	if(hasPaths){
+		std::sort(artworks.begin(), artworks.end(),
+				[](const ArtworkInfo &a, const ArtworkInfo &b) {
+					return a.awOrder < b.awOrder;
+				});
+
+		for (auto artwork : artworks) {
+			std::cout << "sorted: " << artwork.awOrder << " " << artwork.awName
+					<< std::endl;
+		}
+		return true;
+	}
+	else {
+		std::cout << "No sub-directories in: " << dirAw << " or " << dirAwMSata << std::endl;
 		return false;
 	}
 }

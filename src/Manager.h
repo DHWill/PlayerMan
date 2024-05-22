@@ -59,8 +59,7 @@ public:
 	std::string fileVideo = "Video.mp4";
 	std::string fileJson = "video_states.json";
 	std::string dirAw = dirApp + "AW/";
-
-
+	std::string dirAwMSata = "/media/sda/AW/";
 };
 
 #endif /* MANAGER_H_ */
