@@ -20,7 +20,7 @@ Manager::~Manager() {
 
 //check in here for legal files
 bool Manager::findAWPaths() {
-	hasPaths = false;
+	bool _hasPaths = false;
 	if(artworks.size() > size_t(0)){
 		artworks.clear();
 	}
@@ -38,9 +38,11 @@ bool Manager::findAWPaths() {
 				aw.awSplash = absFileLoc + "sig.png";
 				aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
 				aw.awOrder = getOrder(absFileLoc + "position.txt");
-				artworks.push_back(aw);
+				if(tools.doesFileExist(aw.awExec)){
+					artworks.push_back(aw);
+				}
 			}
-			hasPaths |= true;
+			_hasPaths = true;
 		}
 	}
 
@@ -49,13 +51,15 @@ bool Manager::findAWPaths() {
 		makeDirCommand = "mkdir " + dirAw;
 		std::cout << dirAw << " Does Not Exist, making it.. " << std::endl;
 		system(makeDirCommand.c_str());
-		hasPaths |= false;
+//		hasPaths |= false;
 	}
 
 	std::string mSataMountPoint = tools.getSataMountPoint();
 
 	if(mSataMountPoint.size() > 0){
 		std::cout << "Found mSATA at:" << mSataMountPoint << std::endl;
+		dirAwMSata = mSataMountPoint  + "/AW/";
+
 
 		if (tools.dirStatus(dirAwMSata.c_str())) {
 			std::vector<std::string> awDirs = tools.getDirsInPath(dirAwMSata.c_str());
@@ -70,9 +74,11 @@ bool Manager::findAWPaths() {
 					aw.awSplash = absFileLoc + "sig.png";
 					aw.splashPixBuf = gdk_pixbuf_new_from_file(aw.awSplash.c_str(), NULL);
 					aw.awOrder = getOrder(absFileLoc + "position.txt");
-					artworks.push_back(aw);
+					if(tools.doesFileExist(aw.awExec)){
+						artworks.push_back(aw);
+					}
 				}
-				hasPaths |= true;
+				_hasPaths = true;
 			}
 		}
 
@@ -83,14 +89,14 @@ bool Manager::findAWPaths() {
 			if(system(makeDirCommand.c_str())){
 				std::cout << "Detected mSATA, made " << dirAwMSata << std::endl;
 			}
-			hasPaths |= false;
+//			hasPaths |= false;
 		}
 	}
 	else{
 		std::cout << "No mSATA Found.." << std::endl;
 	}
 
-	if(hasPaths){
+	if(_hasPaths){
 		std::sort(artworks.begin(), artworks.end(),[](const ArtworkInfo &a, const ArtworkInfo &b) {
 			return a.awOrder < b.awOrder;
 		});
@@ -99,6 +105,7 @@ bool Manager::findAWPaths() {
 			std::cout << "sorted: " << artwork.awOrder << " " << artwork.awName << std::endl;
 			makeFileExecutable(artwork.awExec);
 		}
+		hasPaths = true;
 		return true;
 	}
 
@@ -133,7 +140,11 @@ void Manager::setAW(ArtworkInfo _artwork){
 	currentArtwork = _artwork;
 }
 
-bool Manager::copyFiles(std::string source, std::string destination){
+bool Manager::copyFiles(std::string source){
+	std::string destination = dirAw;
+	if(dirAwMSata.size() > 0){
+		destination = dirAwMSata;
+	}
 	std::string command;
 	command = "cp -rp " + source + " " + destination;
 	int _ret = tools.runSystem(command);

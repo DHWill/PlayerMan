@@ -34,7 +34,7 @@ public:
 	void killPlayer();
 	void launchPlayer(ArtworkInfo awInfo);
 	void setAW(ArtworkInfo _artwork);
-	bool copyFiles(std::string source, std::string destination);
+	bool copyFiles(std::string source);
 	bool removeFiles(std::string source);
 	bool cleanUpFalseCopy(std::string source);
 	bool makeFolderExecutable(std::string destination);
@@ -60,7 +60,7 @@ public:
 	std::string fileVideo = "Video.mp4";
 	std::string fileJson = "video_states.json";
 	std::string dirAw = dirApp + "AW/";
-	std::string dirAwMSata = "/media/sda/AW/";
+	std::string dirAwMSata;
 };
 
 #endif /* MANAGER_H_ */

@@ -1,0 +1,109 @@
+To pack multiple files of different types into one file without compression using Bash, and then unpack them using C++, you can use a simple concatenation approach in Bash and implement the corresponding logic in C++ to split the packed file back into its original components.
+
+### Step 1: Pack Files Using Bash
+
+First, let's create a Bash script to concatenate multiple files into one.
+
+```bash
+#!/bin/bash
+
+# Define the output packed file
+output_file="packed_file.dat"
+
+# Ensure the output file is empty
+> "$output_file"
+
+# Iterate over all input files
+for input_file in "$@"; do
+    # Get the file size
+    file_size=$(stat -c%s "$input_file")
+    
+    # Write the file name, size, and content to the output file
+    echo "$input_file" >> "$output_file"
+    echo "$file_size" >> "$output_file"
+    cat "$input_file" >> "$output_file"
+done
+```
+
+Save this script as `pack_files.sh`. To pack files, run the script with the filenames as arguments:
+
+```bash
+./pack_files.sh file1.txt file2.png file3.pdf
+```
+
+### Step 2: Unpack Files Using C++
+
+Now, let's create a C++ program to unpack the concatenated file.
+
+```cpp
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+void unpackFiles(const std::string& packedFileName) {
+    std::ifstream packedFile(packedFileName, std::ios::binary);
+    if (!packedFile.is_open()) {
+        std::cerr << "Failed to open packed file." << std::endl;
+        return;
+    }
+
+    while (packedFile) {
+        std::string fileName;
+        std::getline(packedFile, fileName);
+        if (fileName.empty()) break;
+
+        std::string fileSizeStr;
+        std::getline(packedFile, fileSizeStr);
+        std::size_t fileSize = std::stoul(fileSizeStr);
+
+        std::vector<char> fileContent(fileSize);
+        packedFile.read(fileContent.data(), fileSize);
+
+        std::ofstream outputFile(fileName, std::ios::binary);
+        if (!outputFile.is_open()) {
+            std::cerr << "Failed to open output file: " << fileName << std::endl;
+            continue;
+        }
+        outputFile.write(fileContent.data(), fileSize);
+        outputFile.close();
+    }
+
+    packedFile.close();
+}
+
+int main() {
+    std::string packedFileName = "packed_file.dat";
+    unpackFiles(packedFileName);
+    return 0;
+}
+```
+
+### Explanation
+
+#### Packing Script (Bash)
+1. `> "$output_file"`: Ensures the output file is empty before starting.
+2. `for input_file in "$@"; do ... done`: Loops through all input files provided as arguments.
+3. `stat -c%s "$input_file"`: Gets the size of each input file.
+4. `echo "$input_file" >> "$output_file"`: Writes the filename to the packed file.
+5. `echo "$file_size" >> "$output_file"`: Writes the file size to the packed file.
+6. `cat "$input_file" >> "$output_file"`: Appends the file content to the packed file.
+
+#### Unpacking Program (C++)
+1. Opens the packed file.
+2. Reads each file's name and size from the packed file.
+3. Reads the file content into a buffer of the appropriate size.
+4. Writes the buffer to a new file with the original name.
+
+### Running the Programs
+1. **Packing**: Run the `pack_files.sh` script with the files to be packed as arguments.
+   ```bash
+   ./pack_files.sh file1.txt file2.png file3.pdf
+   ```
+2. **Unpacking**: Compile and run the C++ program.
+   ```sh
+   g++ -o unpack_files unpack_files.cpp
+   ./unpack_files
+   ```
+
+This approach concatenates the files without compression, recording their names and sizes for proper unpacking. The C++ program reads this information to reconstruct the original files.

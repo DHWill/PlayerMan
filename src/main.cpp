@@ -113,7 +113,7 @@ static void on_file_selected(GtkFileChooser *chooser, gint response_id, gpointer
 
 	//This is copy folder
 	if (response_id == GTK_RESPONSE_ACCEPT) {
-		if (data->awManager->copyFiles(filename, data->awManager->dirAw)) {
+		if (data->awManager->copyFiles(filename)){
 			_message = "Copied " + std::string(filename) + " to: " + data->awManager->dirAw;
 //			data->awManager->makeFolderExecutable(std::string(filename));
 		} else {
