@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #This is For Backlight
-gpioset 2 9=0 &
+gpioset 2 8=0 &
 #This is Debug Light
 gpioset 2 9=0 &
 /home/root/player/launcher.sh &>/dev/null
