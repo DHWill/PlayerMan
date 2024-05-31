@@ -86,14 +86,15 @@ void NetworkingMan::startListening(){
 		messageReceived = _networking.message;
 		networkListenerThread->join();
 	}
-//	else {
-////		while(! _networking.setup()){
-////			usleep(100000)
-//
-////		}
-//		_networking.setup();
-//	}
-	networkListenerThread.reset(new std::thread(&Networking::udpListener, &_networking));
+	else {
+//		while(! _networking.setup()){
+//			usleep(100000)
+
+//		}
+//		if(!_networking.bound){
+			_networking.setup();
+		}
+		networkListenerThread.reset(new std::thread(&Networking::udpListener, &_networking));
 }
 
 bool NetworkingMan::isMessageReceived(){
@@ -108,7 +109,7 @@ bool NetworkingMan::isMessageReceived(){
 NetworkingMan::awInfo NetworkingMan::receivedMessage(){
 	awInfo _awInfo;
 //    std::string udpMessage = "GROUP_00--UPDATE_INDEX=Zeus";
-//To Test 'echo GROUP_00--UPDATE_INDEX=Atlas | tr -d '\n' | nc -u -w1 192.168.1.131 8080'
+//To Test 'echo GROUP_00--UPDATE_INDEX=Atlas | tr -d '\n' | nc -u -b 192.168.1.255 6006'
 
     std::cout << "messageReceived "<< _networking.message << std::endl;
     std::vector<std::string> parsedMessage = splitStrings(messageReceived, "--");

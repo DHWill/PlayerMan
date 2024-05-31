@@ -31,4 +31,5 @@ OBJS :=
 SUBDIRS := \
 src \
 src/Networking \
+src/Sensor \
 

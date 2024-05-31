@@ -218,6 +218,7 @@ static void activate(GtkApplication* app, gpointer user_data){
 		data->awManager->is_changing = true;
 		g_timeout_add(guint(1000), showArtworkInfo, user_data);
 		gtk_widget_show_all(data->window);
+		data->networkingMan->startListening();
 	}
 	else{
 		open_file_dialog(user_data);
@@ -246,7 +247,7 @@ int main (int argc,char **argv){
     data->networkingMan = netManager;
     data->window = window;
     data->awManager = manager;
-	data->networkingMan->startListening();
+//	data->networkingMan->startListening();
 
 
     g_signal_connect(app, "activate", G_CALLBACK (activate), data);
