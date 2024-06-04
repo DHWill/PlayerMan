@@ -211,6 +211,7 @@ static void activate(GtkApplication* app, gpointer user_data){
 	GtkWidget *image;
 	image = gtk_image_new_from_file(data->awManager->dirSplash.c_str());
 	gtk_container_add(GTK_CONTAINER(data->window), image);
+	data->awManager->tools.runSystem("gpioset 2 8=0");	//Turn on Backlight
 	data->image = image;
 
 	if(data->awManager->hasPaths && (!data->awManager->is_setup)){
